@@ -29,6 +29,7 @@ class MyButton extends StatelessWidget {
           fontWeight: FontWeight.w500,
         ),
       ),
+
       child: Text(
         text,
         style: GoogleFonts.montserrat(
