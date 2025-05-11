@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:e_commerce_platzi/view/login_screen/login_screen.dart';
 import 'package:e_commerce_platzi/view_model/authentication/auth_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,7 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
-  TextEditingController();
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +65,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             backgroundColor: AppColors.kBgColor,
                             radius: 50,
                             backgroundImage:
-                            cubit.croppedImage == null
-                                ? AssetImage("assets/image/default.jpg")
-                                : FileImage(File(cubit.croppedImage!.path)),
+                                cubit.croppedImage == null
+                                    ? AssetImage("assets/image/default.jpg")
+                                    : FileImage(File(cubit.croppedImage!.path)),
                           );
                         },
                       ),
@@ -75,9 +76,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         right: 0,
                         child: GestureDetector(
                           onTap: () {
-                            controller =
-                                _scaffoldKey.currentState!.showBottomSheet((
-                                    context) {
+                            controller = _scaffoldKey.currentState!
+                                .showBottomSheet((context) {
                                   var cubit = AuthCubit.get(context);
                                   return Column(
                                     mainAxisSize: MainAxisSize.min,
@@ -134,16 +134,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return "Email cannot be empty";
                     }
                   },
-
                 ),
                 const SizedBox(height: 20),
                 MyTextFormField(
                   controller: _usernameController,
                   hintText: "Username",
                   prefixIcon: Icons.person,
-                  validatorFunction: (p0) {
-
-                  },
+                  validatorFunction: (p0) {},
                 ),
                 const SizedBox(height: 20),
 
@@ -151,9 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _passwordController,
                   hintText: "Password",
                   prefixIcon: Icons.lock,
-                  validatorFunction: (p0) {
-
-                  },
+                  validatorFunction: (p0) {},
                   isPassword: true,
                 ),
                 const SizedBox(height: 20),
@@ -162,9 +157,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _confirmPasswordController,
                   hintText: "Confirm Password",
                   prefixIcon: Icons.lock,
-                  validatorFunction: (p0) {
-
-                  },
+                  validatorFunction: (p0) {},
                   isPassword: true,
                 ),
 
@@ -176,19 +169,52 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     print(AuthCubit.get(context).imageLink);
                   },
                   builder: (context, state) {
-                    if(state is UploadImageLoading){
+                    if (state is RegisterLoading || state is UploadImageLoading) {
                       return Center(
                         child: CircularProgressIndicator(
                           color: AppColors.kPrimaryColor,
                         ),
                       );
                     }
-                    return MyButton(text: "Register", function: () {
-                      if (_formKey.currentState!.validate()) {
-                        AuthCubit.get(context).uploadImage();
-                      }
-                    });
+                    return MyButton(
+                      text: "Register",
+                      function: () {
+                        if (_formKey.currentState!.validate()) {
+                          AuthCubit.get(context).register(
+                            email: _emailController.text,
+                            password: _passwordController.text,
+                            username: _usernameController.text,
+                          );
+                        }
+                      },
+                    );
                   },
+                ),
+                const SizedBox(height: 20),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Already have an account? ",
+                      style: GoogleFonts.montserrat(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: ()=>Navigator.pushReplacement(context, 
+                      MaterialPageRoute(builder: (_)=>LoginScreen())
+                      ),
+                      child: Text(
+                        "Login",
+                        style: GoogleFonts.montserrat(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.kPrimaryColor
+                        ),
+                      ),
+                    )
+                  ],
                 ),
               ],
             ),

@@ -18,3 +18,8 @@ final class RegisterError extends AuthState {}
 final class UploadImageLoading extends AuthState {}
 final class UploadImageSuccessfully extends AuthState {}
 final class UploadImageError extends AuthState {}
+
+
+final class LoginLoading extends AuthState {}
+final class LoginSuccessfully extends AuthState {}
+final class LoginError extends AuthState {}

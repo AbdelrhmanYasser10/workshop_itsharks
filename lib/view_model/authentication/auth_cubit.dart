@@ -14,7 +14,7 @@ part 'auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInitial());
 
-  static AuthCubit get(context)=>BlocProvider.of(context);
+  static AuthCubit get(context) => BlocProvider.of(context);
 
   final ImagePicker picker = ImagePicker();
   XFile? image;
@@ -22,28 +22,25 @@ class AuthCubit extends Cubit<AuthState> {
 
   String? imageLink;
 
-  void getImage(String source)async{
-    if(source =="camera"){
+  void getImage(String source) async {
+    if (source == "camera") {
       image = await picker.pickImage(source: ImageSource.camera);
-      if(image != null){
+      if (image != null) {
         emit(PickImageSuccessfully());
-      }
-      else{
+      } else {
         emit(PickImageError());
       }
-    }
-    else{
+    } else {
       image = await picker.pickImage(source: ImageSource.gallery);
-      if(image != null){
+      if (image != null) {
         emit(PickImageSuccessfully());
-      }
-      else{
+      } else {
         emit(PickImageError());
       }
     }
   }
 
-  void cropImage()async{
+  void cropImage() async {
     croppedImage = await ImageCropper().cropImage(
       sourcePath: image!.path,
       uiSettings: [
@@ -65,42 +62,75 @@ class AuthCubit extends Cubit<AuthState> {
         ),
       ],
     );
-    if(croppedImage == null){
+    if (croppedImage == null) {
       emit(CropImageError());
-    }
-    else{
+    } else {
       emit(CropImageSuccessfully());
     }
   }
 
-  void uploadImage()async{
+  Future<void> uploadImage() async {
     emit(UploadImageLoading());
     try {
       Response response = await DioHelper.uploadFiles(
         endpoint: "files/upload",
-        body: FormData.fromMap(
-            {
-              "file": await MultipartFile.fromFile(
-                croppedImage!.path,
-                filename: croppedImage!
-                    .path
-                    .split("/")
-                    .last,
-              ),
-            }
-        ),
+        body: FormData.fromMap({
+          "file": await MultipartFile.fromFile(
+            croppedImage!.path,
+            filename: croppedImage!.path.split("/").last,
+          ),
+        }),
       );
       imageLink = response.data["location"];
       emit(UploadImageSuccessfully());
-
-    }catch(error){
+    } catch (error) {
       emit(UploadImageError());
     }
   }
 
   void register({
-  required String email,
+    required String email,
     required String password,
     required String username,
-}){}
+  }) async {
+    emit(RegisterLoading());
+    try {
+      await uploadImage();
+
+      Response response = await DioHelper.postRequest(
+        endpoint: "users/",
+        body: {
+          "email": email,
+          "password": password,
+          "name": username,
+          "avatar": imageLink,
+        },
+      );
+      if (response.statusCode == 201) {
+        print(response.data);
+        emit(RegisterSuccessfully());
+      } else {
+        print(response.data);
+        emit(RegisterError());
+      }
+    } catch (error) {
+      print(error);
+      emit(RegisterError());
+    }
+  }
+
+  void login({required String email, required String password}) async {
+    emit(LoginLoading());
+    try {
+      Response response = await DioHelper.postRequest(
+        endpoint: "auth/login",
+        body: {"email": email, "password": password},
+      );
+      print(response.data);
+      response.data["access_token"]; // caching (important !!!)
+      emit(LoginSuccessfully());
+    } catch (error) {
+      emit(LoginError());
+    }
+  }
 }

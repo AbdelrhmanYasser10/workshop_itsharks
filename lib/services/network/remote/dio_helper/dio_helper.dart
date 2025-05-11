@@ -24,7 +24,7 @@ abstract class DioHelper{
     Map<String,dynamic>? body,
     Map<String,dynamic>? query,
   })async{
-
+    _dio!.options.headers["Content-Type"] ="application/json";
     return await _dio!.post(
       endpoint,
       data: body,
