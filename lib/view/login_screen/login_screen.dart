@@ -1,9 +1,11 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:e_commerce_platzi/view/main_layout/main_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../utlis/app_colors.dart';
+import '../../utlis/app_functions.dart';
 import '../../view_model/authentication/auth_cubit.dart';
 import '../../widgets/my_button.dart';
 import '../../widgets/my_text_form_field.dart';
@@ -67,24 +69,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 BlocConsumer<AuthCubit, AuthState>(
                   listener: (context, state) {
                     if(state is LoginSuccessfully){
-                      final snackBar = SnackBar(
-                        /// need to set following properties for best effect of awesome_snackbar_content
-                        elevation: 0,
-                        behavior: SnackBarBehavior.floating,
-                        backgroundColor: Colors.transparent,
-                        content: AwesomeSnackbarContent(
-                          title: 'On Snap!',
-                          message:
-                          'This is an example error message that will be shown in the body of snackbar!',
-
-                          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-                          contentType: ContentType.success,
-                        ),
+                      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>MainLayout()), (route)=>false);
+                      showAppSnackBar(
+                        context,
+                        "",
+                        "",
+                        ContentType.success,
                       );
-
-                      ScaffoldMessenger.of(context)
-                        ..hideCurrentSnackBar()
-                        ..showSnackBar(snackBar);
+                      
                     }
                   },
                   builder: (context, state) {

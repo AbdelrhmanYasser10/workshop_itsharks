@@ -164,10 +164,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 75),
 
                 BlocConsumer<AuthCubit, AuthState>(
-                  listener: (context, state) {
-                    print(state);
-                    print(AuthCubit.get(context).imageLink);
-                  },
+                  listener: (context, state) {},
                   builder: (context, state) {
                     if (state is RegisterLoading || state is UploadImageLoading) {
                       return Center(

@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
+import 'package:e_commerce_platzi/services/network/local/cache_helper/cache_helper.dart';
 import 'package:e_commerce_platzi/services/network/remote/dio_helper/dio_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -127,7 +128,8 @@ class AuthCubit extends Cubit<AuthState> {
         body: {"email": email, "password": password},
       );
       print(response.data);
-      response.data["access_token"]; // caching (important !!!)
+      // cache token
+      SharedPreferencesHelper.saveData(key: "token", value: response.data["access_token"]); // caching (important !!!)
       emit(LoginSuccessfully());
     } catch (error) {
       emit(LoginError());
