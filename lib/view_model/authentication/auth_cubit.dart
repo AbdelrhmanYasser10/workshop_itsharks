@@ -128,11 +128,17 @@ class AuthCubit extends Cubit<AuthState> {
         body: {"email": email, "password": password},
       );
       print(response.data);
-      // cache token
-      await SharedPreferencesHelper.saveData(key: "token", value: response.data["access_token"]); // caching (important !!!)
-      emit(LoginSuccessfully());
+      if(response.statusCode == 201) {
+        // cache token
+        await SharedPreferencesHelper.saveData(key: "token",
+            value: response.data["access_token"]); // caching (important !!!)
+        emit(LoginSuccessfully());
+      }
+      else{
+        emit(LoginError(response.data["message"]));
+      }
     } catch (error) {
-      emit(LoginError());
+      emit(LoginError(error.toString()));
     }
   }
 }

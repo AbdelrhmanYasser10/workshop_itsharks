@@ -1,5 +1,6 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:e_commerce_platzi/view/main_layout/main_layout.dart';
+import 'package:e_commerce_platzi/view_model/home_cubit/home_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -70,13 +71,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   listener: (context, state) {
                     if(state is LoginSuccessfully){
                       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>MainLayout()), (route)=>false);
+                      HomeCubit.get(context).getProfile();
+                      HomeCubit.get(context).getCategories();
                       showAppSnackBar(
                         context,
-                        "",
+                        "Logged in successfully",
                         "",
                         ContentType.success,
                       );
                       
+                    }
+                    if(state is LoginError){
+                      showAppSnackBar(
+                        context,
+                        "Login Error",
+                        state.message,
+                        ContentType.failure,
+                      );
                     }
                   },
                   builder: (context, state) {

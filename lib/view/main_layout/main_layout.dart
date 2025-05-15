@@ -6,7 +6,7 @@ import '../../utlis/app_colors.dart';
 import '../home_screen/home_screen.dart';
 
 class MainLayout extends StatefulWidget {
-  const MainLayout({Key? key}) : super(key: key);
+  const MainLayout({super.key});
 
   @override
   State<MainLayout> createState() => _MainLayoutState();
@@ -14,51 +14,10 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout> {
   int _activeIdx = 0;
-  final List<AppBar> _appBar = [
-    AppBar(
-      leading: IconButton(
-        onPressed: () {},
-        icon: Icon(Icons.menu, color: AppColors.kIconColor),
-      ),
-      title: Image.asset("assets/image/logoipsum-255 1.png"),
-      centerTitle: true,
-      actions: [
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 8.0,
-          ),
-          child: CircleAvatar(
-            backgroundColor: Colors.black,
-          ),
-        )
-      ],
-    ),
-    AppBar(),
-    AppBar(),
-    AppBar(),
-  ];
   List<Widget> _screens = [HomeScreen(), Scaffold(), Scaffold(), Scaffold()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.menu, color: AppColors.kIconColor),
-        ),
-        title: Image.asset("assets/image/logoipsum-255 1.png"),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 8.0,
-            ),
-            child: CircleAvatar(
-              backgroundColor: Colors.black,
-            ),
-          )
-        ],
-      ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(8.0),
         child: GNav(

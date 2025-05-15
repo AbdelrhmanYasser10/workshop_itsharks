@@ -14,6 +14,7 @@ abstract class DioHelper{
         validateStatus: (status) {
           return status! <= 505;
         },
+
       ),
     );
   }
@@ -42,5 +43,17 @@ abstract class DioHelper{
       endpoint,
       data: body,
     );
+  }
+
+
+  static Future<Response> getData({
+  required String endpoint,
+    String? token,
+    Map<String,dynamic>?queryParams,
+}) async{
+    _dio!..options.headers = {
+      "Authorization":"Bearer $token"
+    };
+    return await _dio!.get(endpoint,queryParameters: queryParams);
   }
 }
