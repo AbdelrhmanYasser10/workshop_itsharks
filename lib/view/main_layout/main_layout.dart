@@ -26,6 +26,7 @@ class _MainLayoutState extends State<MainLayout> {
               _activeIdx = value;
             });
           },
+          backgroundColor: AppColors.kBgColor,
           tabBorderRadius: 6,
           curve: Curves.easeOutExpo, // tab animation curves
           duration: Duration(milliseconds: 400), // tab animation duration

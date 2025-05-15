@@ -58,6 +58,26 @@ class HomeCubit extends Cubit<HomeState> {
       emit(GetCategoriesError());
     }
   }
+  
+  void getTopProducts()async{
+    emit(GetProductsLoading());
+    try{
+      Response response = await DioHelper.getData(endpoint: "products/");
+      if(response.statusCode == 200){
+        for(int i = 0 ; i < 20;i++){
+          ProductModel currProduct = ProductModel.fromJson(response.data[i]);
+          allProducts.add(currProduct);
+        }
+        emit(GetProductsSuccessfully());
+      }
+      else{
+        emit(GetProductsError());
+
+      }
+    }catch(err){
+      emit(GetProductsError());
+    }
+  }
 
 
 }
