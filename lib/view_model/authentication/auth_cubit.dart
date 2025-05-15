@@ -129,7 +129,7 @@ class AuthCubit extends Cubit<AuthState> {
       );
       print(response.data);
       // cache token
-      SharedPreferencesHelper.saveData(key: "token", value: response.data["access_token"]); // caching (important !!!)
+      await SharedPreferencesHelper.saveData(key: "token", value: response.data["access_token"]); // caching (important !!!)
       emit(LoginSuccessfully());
     } catch (error) {
       emit(LoginError());
