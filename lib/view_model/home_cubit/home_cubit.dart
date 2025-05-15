@@ -64,7 +64,7 @@ class HomeCubit extends Cubit<HomeState> {
     try{
       Response response = await DioHelper.getData(endpoint: "products/");
       if(response.statusCode == 200){
-        for(int i = 0 ; i < 20;i++){
+        for(int i = 0 ; i < 10;i++){
           ProductModel currProduct = ProductModel.fromJson(response.data[i]);
           allProducts.add(currProduct);
         }
