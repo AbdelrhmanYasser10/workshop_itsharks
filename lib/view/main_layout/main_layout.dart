@@ -1,10 +1,14 @@
+import 'package:e_commerce_platzi/view_model/theme_cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
 
 import '../../utlis/app_colors.dart';
 import '../categories_screen/categories_screen.dart';
 import '../home_screen/home_screen.dart';
+import '../profile_screen/profile_screen.dart';
+import '../search_screen/search_screen.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -15,39 +19,52 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout> {
   int _activeIdx = 0;
-  List<Widget> _screens = [HomeScreen(), CategoriesScreen(), Scaffold(), Scaffold()];
+  final List<Widget> _screens = [
+    HomeScreen(),
+    CategoriesScreen(),
+    SearchScreen(),
+    ProfileScreen(),
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: GNav(
-          onTabChange: (value) {
-            setState(() {
-              _activeIdx = value;
-            });
+        child: BlocConsumer<ThemeCubit, ThemeState>(
+          listener: (context, state) {},
+          builder: (context, state) {
+            var isDarkMood = ThemeCubit.get(context).isDark;
+            return GNav(
+              onTabChange: (value) {
+                setState(() {
+                  _activeIdx = value;
+                });
+              },
+              backgroundColor:
+                  isDarkMood ? AppColors.kBgDarkColor : AppColors.kBgColor,
+              tabBorderRadius: 6,
+              curve: Curves.easeOutExpo, // tab animation curves
+              duration: Duration(milliseconds: 400), // tab animation duration
+              gap: 8, // the tab button gap between icon and text
+              color: AppColors.kIconColor, // unselected icon color
+              activeColor:
+                  AppColors.kPrimaryColor, // selected icon and text color
+              iconSize: 24, // tab button icon size
+              tabBackgroundColor: AppColors.kPrimaryColor.withOpacity(
+                0.2,
+              ), // selected tab background color
+              padding: EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 5,
+              ), // navigation bar padding
+              tabs: [
+                GButton(icon: LineIcons.home, text: 'Home'),
+                GButton(icon: LineIcons.shoppingBag, text: 'Categories'),
+                GButton(icon: LineIcons.search, text: 'Search'),
+                GButton(icon: LineIcons.user, text: 'Profile'),
+              ],
+            );
           },
-          backgroundColor: AppColors.kBgColor,
-          tabBorderRadius: 6,
-          curve: Curves.easeOutExpo, // tab animation curves
-          duration: Duration(milliseconds: 400), // tab animation duration
-          gap: 8, // the tab button gap between icon and text
-          color: AppColors.kIconColor, // unselected icon color
-          activeColor: AppColors.kPrimaryColor, // selected icon and text color
-          iconSize: 24, // tab button icon size
-          tabBackgroundColor: AppColors.kPrimaryColor.withOpacity(
-            0.2,
-          ), // selected tab background color
-          padding: EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 5,
-          ), // navigation bar padding
-          tabs: [
-            GButton(icon: LineIcons.home, text: 'Home'),
-            GButton(icon: LineIcons.shoppingBag, text: 'Categories'),
-            GButton(icon: LineIcons.search, text: 'Search'),
-            GButton(icon: LineIcons.user, text: 'Profile'),
-          ],
         ),
       ),
       body: _screens[_activeIdx],

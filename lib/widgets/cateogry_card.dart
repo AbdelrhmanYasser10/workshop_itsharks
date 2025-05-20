@@ -1,6 +1,7 @@
 
 import 'package:e_commerce_platzi/view/filtered_producuts/filteredProducts.dart';
 import 'package:e_commerce_platzi/view_model/home_cubit/home_cubit.dart';
+import 'package:e_commerce_platzi/view_model/theme_cubit/theme_cubit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,13 +14,14 @@ class CategoriesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var isDarkMood = ThemeCubit.get(context).isDark;
     return GestureDetector(
       onTap: (){
         HomeCubit.get(context).getProductsFromCategory(categoryId: categories.id!);
         Navigator.push(context, MaterialPageRoute(builder: (_)=>FilteredProducts()));
       },
       child: Card(
-        color: Colors.white,
+        color: isDarkMood ?Colors.black :Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
         child: Column(
           children: [

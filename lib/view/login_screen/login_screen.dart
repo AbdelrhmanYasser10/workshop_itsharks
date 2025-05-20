@@ -27,7 +27,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.kBgColor,
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
@@ -41,7 +40,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: GoogleFonts.montserrat(
                     fontSize: 32.0,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
                   ),
                 ),
                 const SizedBox(height: 50),
@@ -120,7 +118,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       "Don't have an account? ",
                       style: GoogleFonts.montserrat(
                           fontWeight: FontWeight.bold,
-                          color: Colors.black
                       ),
                     ),
                     GestureDetector(

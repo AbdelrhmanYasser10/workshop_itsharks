@@ -1,3 +1,4 @@
+import 'package:e_commerce_platzi/view_model/theme_cubit/theme_cubit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,6 +20,8 @@ class OnBoardingScreen extends StatefulWidget {
 class _OnBoardingScreenState extends State<OnBoardingScreen> {
   PageController pageController = PageController();
   var isLast = false;
+  int currIdx = 0;
+
   void finishOnBoarding(context, String screen) {
     SharedPreferencesHelper.saveData(key: 'onBoarding', value: isLast);
     Navigator.of(context).pushNamedAndRemoveUntil(screen, (route) => false);
@@ -36,7 +39,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             child: Text(
               'Skip',
               style: GoogleFonts.montserrat(
-                color: Colors.black,
+                color:ThemeCubit.get(context).isDark ?  Colors.white:Colors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -48,13 +51,16 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           Expanded(
 
             child: PageView.builder(
+              controller: pageController,
               onPageChanged: (int index) {
                 if (index == dataOnBoarding.length - 1) {
                   setState(() {
+                    currIdx = index;
                     isLast = true;
                   });
                 } else {
                   setState(() {
+                    currIdx = index;
                     isLast = false;
                   });
                 }
@@ -67,62 +73,69 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               itemCount: dataOnBoarding.length,
             ),
           ),
-          SizedBox(
-            height: 100,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                SmoothPageIndicator(
-                  controller: pageController,
-                
-                  count: dataOnBoarding.length,
-                  axisDirection: Axis.horizontal,
-                  effect: SlideEffect(
-                    spacing: 8.0,
-                    radius: 4.0,
-                    dotWidth: 24.0,
-                    dotHeight: 16.0,
-                    paintStyle: PaintingStyle.stroke,
-                    strokeWidth: 1.5,
-                    dotColor: Colors.grey,
-                    activeDotColor: AppColors.kPrimaryColor,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              (currIdx > 0 && !isLast)? TextButton(
+                onPressed: () {
+                  pageController.previousPage(
+                      duration: Duration(milliseconds: 900),
+                      curve: Curves.decelerate);
+                },
+                child: Text(
+                  'Prev',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.kPrimaryColor,
                   ),
                 ),
-                TextButton(
-                  onPressed: () {
+              ):const SizedBox(),
+              const Spacer(),
+
+              SmoothPageIndicator(
+                controller: pageController,
+
+                count: dataOnBoarding.length,
+                axisDirection: Axis.horizontal,
+                effect: SlideEffect(
+                  spacing: 8.0,
+                  radius: 4.0,
+                  dotWidth: 24.0,
+                  dotHeight: 16.0,
+                  paintStyle: PaintingStyle.stroke,
+                  strokeWidth: 1.5,
+                  dotColor: Colors.grey,
+                  activeDotColor: AppColors.kPrimaryColor,
+                ),
+              ),
+              const Spacer(),
+
+              TextButton(
+                onPressed: () {
+                  if(isLast) {
                     Navigator.pushNamedAndRemoveUntil(
                       context,
                       AppRouter.LoginScreen,
-                      (route) => false,
+                          (route) => false,
                     );
-                  },
-                  child: Text(
-                    'Next',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.kPrimaryColor,
-                    ),
+                  }
+                  else {
+                    pageController.nextPage(
+                        duration: Duration(milliseconds: 900),
+                        curve: Curves.decelerate);
+                  }
+                },
+                child: Text(
+                  isLast ? 'Get Started':'Next',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.kPrimaryColor,
                   ),
                 ),
-                Visibility(
-                  visible: isLast,
-                  child: TextButton(
-                    onPressed: () {
-                      finishOnBoarding(context, AppRouter.GetStartedScreen);
-                    },
-                    child: Text(
-                      'Get Started',
-                      style: GoogleFonts.montserrat(
-                        color: AppColors.kPrimaryColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),

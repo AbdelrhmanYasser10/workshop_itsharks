@@ -21,9 +21,9 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    SharedPreferencesHelper.getData(key: 'onBoarding') ==  null?
+  /*  SharedPreferencesHelper.getData(key: 'onBoarding') ==  null?
         ()=> Navigator.pushReplacementNamed(context, AppRouter.OnBoardingScreen):
-        ()=> Navigator.pushReplacementNamed(context, AppRouter.LoginScreen);
+        ()=> Navigator.pushReplacementNamed(context, AppRouter.LoginScreen);*/
     super.initState();
   }
   @override

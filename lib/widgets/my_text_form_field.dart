@@ -1,3 +1,4 @@
+import 'package:e_commerce_platzi/view_model/theme_cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -12,12 +13,16 @@ class MyTextFormField extends StatefulWidget {
   final TextEditingController controller;
   final String?Function(String?) validatorFunction;
   final bool isPassword;
+  final void Function(String?)? onChange;
+  final bool enable;
   const MyTextFormField({
     super.key,
     required this.hintText,
     required this.prefixIcon,
     required this.controller,
     required this.validatorFunction,
+    this.onChange,
+    this.enable = true,
     this.isPassword = false,
   });
 
@@ -32,7 +37,10 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
 
   @override
   Widget build(BuildContext context) {
+    var isDarkMood = ThemeCubit.get(context).isDark;
     return TextFormField(
+      enabled: widget.enable,
+      onChanged: widget.onChange,
       obscureText: isSecure,
       controller: widget.controller,
       validator: widget.validatorFunction,
@@ -48,17 +56,18 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
           isSecure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
         ),
         ) :null,
-        fillColor: AppColors.kTextFieldColor,
+        fillColor: isDarkMood ?Colors.black:
+        AppColors.kTextFieldColor,
         filled: true,
         hintText: widget.hintText,
         hintStyle: GoogleFonts.montserrat(
           fontSize: 14.0,
-          color: AppColors.kIconColor,
+          color:isDarkMood?Colors.grey: AppColors.kIconColor,
           fontWeight: FontWeight.w500,
         ),
         prefixIcon: Icon(
           widget.prefixIcon,
-          color: AppColors.kIconColor,
+          color:isDarkMood?Colors.white: AppColors.kIconColor,
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6.0),
@@ -92,7 +101,7 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
       style: GoogleFonts.montserrat(
           fontWeight: FontWeight.bold,
           fontSize: 14.0,
-          color: Colors.black
+          color: isDarkMood ?Colors.white :Colors.black
       ),
     );
   }

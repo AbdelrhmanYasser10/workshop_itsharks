@@ -35,8 +35,6 @@ class CategoriesScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             centerTitle: true,
-            backgroundColor: AppColors.kBgColor,
-            surfaceTintColor: AppColors.kBgColor,
             leading: IconButton(
               onPressed: () {},
               icon: Icon(Icons.menu, color: AppColors.kIconColor),

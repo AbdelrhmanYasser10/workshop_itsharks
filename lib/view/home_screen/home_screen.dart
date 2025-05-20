@@ -35,10 +35,7 @@ class HomeScreen extends StatelessWidget {
         var cubit = HomeCubit.get(context);
 
         return Scaffold(
-          backgroundColor: AppColors.kBgColor,
           appBar: AppBar(
-            backgroundColor: AppColors.kBgColor,
-            surfaceTintColor: AppColors.kBgColor,
             leading: IconButton(
               onPressed: () {},
               icon: Icon(Icons.menu, color: AppColors.kIconColor),

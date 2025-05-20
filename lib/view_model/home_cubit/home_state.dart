@@ -21,3 +21,6 @@ final class GetProductsFromCategoryLoading extends HomeState {}
 final class GetProductsFromCategorySuccessfully extends HomeState {}
 final class GetProductsFromCategoryError extends HomeState {}
 
+final class GetProductsFromSearchLoading extends HomeState {}
+final class GetProductsFromSearchSuccessfully extends HomeState {}
+final class GetProductsFromSearchError extends HomeState {}
