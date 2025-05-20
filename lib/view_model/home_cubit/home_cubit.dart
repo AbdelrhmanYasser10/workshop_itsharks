@@ -17,6 +17,7 @@ class HomeCubit extends Cubit<HomeState> {
   UserModel? user;
   List<ProductModel> allProducts = [];
   List<CategoryModel> allCategories = [];
+  List<ProductModel> allProductsFromCategory = [];
 
   void getProfile() async{
     emit(GetProfileLoading());
@@ -40,6 +41,7 @@ class HomeCubit extends Cubit<HomeState> {
   
   void getCategories()async{
     emit(GetCategoriesLoading());
+    allCategories = [];
     try{
       Response r = await DioHelper.getData(endpoint: "categories/");
       if(r.statusCode == 200){
@@ -76,6 +78,35 @@ class HomeCubit extends Cubit<HomeState> {
       }
     }catch(err){
       emit(GetProductsError());
+    }
+  }
+  
+  void getProductsFromCategory({
+  required int categoryId
+})async{
+    emit(GetProductsFromCategoryLoading());
+    allProductsFromCategory = [];
+    try{
+      Response result = await DioHelper.getData(
+          endpoint: "products/",
+        queryParams: {
+            "categoryId":categoryId
+        },
+      );
+      if(result.statusCode == 200){
+        result.data.forEach((element){
+          ProductModel currProduct = ProductModel.fromJson(element);
+          allProductsFromCategory.add(currProduct);
+        });
+        emit(GetProductsFromCategorySuccessfully());
+      }
+      else{
+        emit(GetProductsFromCategoryError());
+
+      }
+
+    }catch(error){
+      emit(GetProductsFromCategoryError());
     }
   }
 

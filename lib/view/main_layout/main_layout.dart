@@ -3,6 +3,7 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
 
 import '../../utlis/app_colors.dart';
+import '../categories_screen/categories_screen.dart';
 import '../home_screen/home_screen.dart';
 
 class MainLayout extends StatefulWidget {
@@ -14,7 +15,7 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout> {
   int _activeIdx = 0;
-  List<Widget> _screens = [HomeScreen(), Scaffold(), Scaffold(), Scaffold()];
+  List<Widget> _screens = [HomeScreen(), CategoriesScreen(), Scaffold(), Scaffold()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(

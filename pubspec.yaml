@@ -44,6 +44,9 @@ dependencies:
   awesome_snackbar_content: ^0.1.5
   google_nav_bar: ^5.0.7
   line_icons: ^2.0.3
+  splash_master: ^0.0.2
+  smooth_page_indicator: ^1.2.1
+  lottie: ^3.3.1
 
 dev_dependencies:
   flutter_test:
@@ -97,3 +100,38 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+splash_master:
+  # Use to specifies the color for the splash screen
+  color: '#FFFFFF'
+  # Use to specifies the splash image
+  image: 'assets/image/logoipsum-255 1.png'
+  # Provides content mode for splash image in iOS
+  # iOS content mode options: scaleToFill, scaleAspectFit, scaleAspectFill, redraw, center, top, bottom,
+  # left, right, topLeft, topRight, bottomLeft, bottomRight.
+  ios_content_mode: 'center'
+  # Provides gravity for splash image in Android
+  # Android gravity options: center, clip_horizontal, clip_vertical, fill_horizontal, fill, center_vertical,
+  # bottom, fill_vertical, center_horizontal, top, end, left, right, start
+  android_gravity: 'center'
+  # Use to specifies the splash image
+  background_image: 'assets/image/logoipsum-255 1.png'
+  # Provided content mode for splash image in background for iOS
+  ios_background_content_mode: 'scaleToFill'
+  # Provides gravity for background image in Android
+  # Android gravity options: center, clip_horizontal, clip_vertical, fill_horizontal, fill, center_vertical,
+  # bottom, fill_vertical, center_horizontal, top, end, left, right, start
+  android_background_image_gravity: 'fill'
+  # Use to specifies image for android in dark mode
+  image_dark_android: 'assets/image/logoipsum-255 1.png'
+  # Provides gravity for splash image for Android in dark mode
+  android_dark_gravity_key: 'center'
+  # Use to specifies the color for the splash screen for Android in dark mode
+  color_dark_android: '#000000'
+  # Section to specifies the configuration for the splash in Android 12+
+  android_12_and_above:
+    # Provides the background color of splash screen
+    color: '#FFFFFF'
+    # Provides custom icon to replace the default app icon
+    image: 'assets/image/logoipsum-255 1.png'
+    # Provides branding image which is shown under main icon image.
+    branding_image: 'assets/image/logoipsum-255 1.png'
