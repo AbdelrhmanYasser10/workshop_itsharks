@@ -114,6 +114,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               TextButton(
                 onPressed: () {
                   if(isLast) {
+                    SharedPreferencesHelper.saveData(key: 'onBoarding', value: isLast);
                     Navigator.pushNamedAndRemoveUntil(
                       context,
                       AppRouter.LoginScreen,
