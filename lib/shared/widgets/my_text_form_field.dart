@@ -10,6 +10,7 @@ class MyTextFormField extends StatefulWidget {
   final IconData prefixIcon;
   final TextEditingController controller;
   final String?Function(String?) validatorFunction;
+  final Widget? suffixButton;
   final bool isPassword;
   final void Function(String?)? onChange;
   final bool enable;
@@ -22,6 +23,7 @@ class MyTextFormField extends StatefulWidget {
     this.onChange,
     this.enable = true,
     this.isPassword = false,
+    this.suffixButton
   });
 
   @override
@@ -51,7 +53,7 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
           }, icon: Icon(
           isSecure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
         ),
-        ) :null,
+        ) :widget.suffixButton,
         fillColor:
         AppColors.kTextFieldColor,
         filled: true,

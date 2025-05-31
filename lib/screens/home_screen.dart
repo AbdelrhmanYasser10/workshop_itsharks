@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:chat_bubbles/bubbles/bubble_normal_image.dart';
 import 'package:chat_bubbles/bubbles/bubble_special_three.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini_clone_app/cubits/chat_cubit/chat_cubit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../shared/styles/app_colors.dart';
 import '../shared/widgets/my_text_form_field.dart';
@@ -19,15 +23,17 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   final _messageController = TextEditingController();
   final _animationController = AnimatedTextController();
   final _scrollController = ScrollController();
-  @override
-  void initState() {
-    super.initState();
 
-  }
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  
+  XFile? selectedImage;
+  
   @override
   bool get wantKeepAlive => true;
+  
   @override
   Widget build(BuildContext context) {
+    super.build(context);
 
     return Builder(
       builder: (context) {
@@ -44,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
           builder: (context, state) {
             ChatCubit cubit = ChatCubit.get(context);
             return Scaffold(
+              key: _scaffoldKey,
               backgroundColor: AppColors.kBgColor,
               appBar: AppBar(
                 backgroundColor: AppColors.kBgColor,
@@ -78,24 +85,37 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                           itemBuilder: (context, index) {
                           if(index < cubit.allMessages.length) {
                             if (!cubit.allMessages[index].isBotSender) {
-                              return BubbleSpecialThree(
-                                text: cubit.allMessages[index].content
-                                    .replaceAll("**", "").replaceAll("*", ""),
-                                tail: false,
-                                isSender: !cubit.allMessages[index].isBotSender,
-                                color: !cubit.allMessages[index].isBotSender ?
-                                AppColors.kPrimaryColor :
-                                AppColors.kLightReceiverBackgroundMessageColor,
-                                textStyle: !cubit.allMessages[index].isBotSender
-                                    ?
-                                GoogleFonts.montserrat(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                )
-                                    : GoogleFonts.montserrat(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
+                              return Column(
+                                children: [
+                                  cubit.allMessages[index].media == null ? SizedBox():
+                                  BubbleNormalImage(
+                                    id: cubit.allMessages[index].media!,
+                                    image: Image.network(
+                                        cubit.allMessages[index].media!
+                                    ),
+                                    isSender: true,
+                                    color: AppColors.kPrimaryColor,
+                                  )  ,
+                                  BubbleSpecialThree(
+                                    text: cubit.allMessages[index].content
+                                        .replaceAll("**", "").replaceAll("*", ""),
+                                    tail: false,
+                                    isSender: !cubit.allMessages[index].isBotSender,
+                                    color: !cubit.allMessages[index].isBotSender ?
+                                    AppColors.kPrimaryColor :
+                                    AppColors.kLightReceiverBackgroundMessageColor,
+                                    textStyle: !cubit.allMessages[index].isBotSender
+                                        ?
+                                    GoogleFonts.montserrat(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    )
+                                        : GoogleFonts.montserrat(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
                               );
                             }
                             else {
@@ -157,6 +177,63 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                       children: [
                         Expanded(
                           child: MyTextFormField(
+                            suffixButton: selectedImage == null ?IconButton(onPressed: (){
+                               _scaffoldKey.currentState!
+                                  .showBottomSheet((context) {
+                                return Container(
+                                  width: double.infinity,
+                                  color: AppColors.kBgColor,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TextButton(
+                                        onPressed: ()async {
+                                          selectedImage = await ImagePicker().pickImage(source: ImageSource.camera);
+                                          if(selectedImage != null) {
+                                            setState(() {
+
+                                            });
+                                          }
+                                        },
+                                        child: Text(
+                                          "Camera",
+                                          style: GoogleFonts.montserrat(
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.kPrimaryColor,
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async{
+                                          selectedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+                                          if(selectedImage != null) {
+                                            setState(() {
+
+                                            });
+                                          }
+                                        },
+                                        child: Text(
+                                          "Gallery",
+                                          style: GoogleFonts.montserrat(
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.kPrimaryColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              });
+                            }, icon: Icon(Icons.attachment)) : CircleAvatar(
+                              radius: 20,
+                              backgroundImage: FileImage(
+                                File(
+                                  selectedImage!.path,
+                                )
+                              ),
+                            ),
                             controller: _messageController,
                             hintText: "Enter your message ....",
                             validatorFunction: (p0) {
@@ -176,7 +253,8 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                               );
                             }
                             else {
-                              cubit.sendMessage(_messageController.text);
+                              cubit.sendMessage(_messageController.text,File(selectedImage!.path));
+                              selectedImage = null;
                               _messageController.clear();
                             }
                           },

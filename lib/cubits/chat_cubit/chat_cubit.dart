@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloudinary/cloudinary.dart';
 import 'package:firebase_ai/firebase_ai.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,6 +26,11 @@ class ChatCubit extends Cubit<ChatState> {
   final model = FirebaseAI.googleAI().generativeModel(
     model: 'gemini-2.0-flash',
   );
+  final cloudinary = Cloudinary.signedConfig(
+    apiKey: "759286832413946",
+    apiSecret: "_I6skpHGJeC2DIAVXMkcHh6MU7s",
+    cloudName: "ddksmtpkd",
+  );
 
   void getUserData() async {
     emit(GetUserDataLoading());
@@ -45,10 +53,23 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  void sendMessage(String content) async {
+  void sendMessage(String content, [File? image]) async {
     //store to firebase
     emit(SendMessageLoading());
     try {
+      CloudinaryResponse? response;
+      if (image != null) {
+        response = await cloudinary.upload(
+          file: image.path,
+          fileBytes: image.readAsBytesSync(),
+          resourceType: CloudinaryResourceType.image,
+          folder: "Gemini - Images",
+          fileName: 'some-name',
+          progressCallback: (count, total) {
+            print('Uploading image from file with progress: $count/$total');
+          },
+        );
+      }
       await _database
           .collection("users")
           .doc(activeUser!.id)
@@ -59,31 +80,58 @@ class ChatCubit extends Cubit<ChatState> {
             "isBotSender": false,
             "time": Timestamp.now(),
             "content": content,
-            "media": null,
+            "media": response?.url!,
           });
-      sendPromptToGemini(content);
+      sendPromptToGemini(content,image);
       emit(SendMessageSuccessfully());
     } catch (error) {
       emit(SendMessageError());
     }
   }
 
-  void sendPromptToGemini(String content) async {
+  void sendPromptToGemini(String content, [File? file]) async {
     emit(SendPromptToGeminiLoading());
     try {
-      final response = await model.generateContent([Content.text(content)]);
-      await _database
-          .collection("users")
-          .doc(activeUser!.id)
-          .collection("chats")
-          .doc("0")
-          .collection("messages")
-          .add({
-            "isBotSender": true,
-            "time": Timestamp.now(),
-            "content": response.text,
-            "media": null,
-          });
+      if(file == null) {
+        final response = await model.generateContent([Content.text(content)]);
+        await _database
+            .collection("users")
+            .doc(activeUser!.id)
+            .collection("chats")
+            .doc("0")
+            .collection("messages")
+            .add({
+          "isBotSender": true,
+          "time": Timestamp.now(),
+          "content": response.text,
+          "media": null,
+        });
+      }
+      else{
+        final prompt = TextPart(content);
+// Prepare images for input
+        final image = await file.readAsBytes();
+        final imageExtenstion = file.path.split("/").last.split(".").last;
+        final imagePart = InlineDataPart('image/$imageExtenstion', image);
+
+// To generate text output, call generateContent with the text and image
+        final response = await model.generateContent([
+          Content.multi([prompt,imagePart])
+        ]);
+
+        await _database
+            .collection("users")
+            .doc(activeUser!.id)
+            .collection("chats")
+            .doc("0")
+            .collection("messages")
+            .add({
+          "isBotSender": true,
+          "time": Timestamp.now(),
+          "content": response.text,
+          "media": null,
+        });
+      }
       emit(SendPromptToGeminiSuccessfully());
     } catch (error) {
       emit(SendPromptToGeminiError());
@@ -91,7 +139,7 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   // Real - time
-  void getAllMessages(){
+  void getAllMessages() {
     emit(GetMessagesLoading());
 
     _database
@@ -102,9 +150,9 @@ class ChatCubit extends Cubit<ChatState> {
         .collection("messages")
         .orderBy("time")
         .snapshots()
-        .listen((event){
+        .listen((event) {
           allMessages = [];
-          for(var json in event.docs){
+          for (var json in event.docs) {
             MessageModel currMessage = MessageModel.fromJson(json.data());
             allMessages.add(currMessage);
           }

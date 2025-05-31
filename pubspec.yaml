@@ -44,6 +44,8 @@ dependencies:
   chat_bubbles: ^1.7.0
   animated_text_kit: ^4.2.3
   formatted_text: ^4.0.1
+  cloudinary: ^1.2.0
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
