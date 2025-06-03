@@ -3,15 +3,18 @@ import 'dart:io';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:chat_bubbles/bubbles/bubble_normal_image.dart';
 import 'package:chat_bubbles/bubbles/bubble_special_three.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini_clone_app/cubits/chat_cubit/chat_cubit.dart';
+import 'package:gemini_clone_app/screens/map_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:social_media_recorder/audio_encoder_type.dart';
 import 'package:social_media_recorder/screen/social_media_recorder.dart';
 import 'package:voice_message_player/voice_message_player.dart';
 
+import '../notification_config.dart';
 import '../shared/styles/app_colors.dart';
 import '../shared/widgets/my_text_form_field.dart';
 
@@ -89,6 +92,11 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   ],
                 ),
+                actions: [
+                  IconButton(onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (_)=>MapScreen()));
+                  }, icon: Icon(Icons.location_on)),
+                ],
               ),
               body:
                   state is GetUserDataLoading
@@ -357,7 +365,7 @@ class _HomeScreenState extends State<HomeScreen>
 
                                 )
                                     : FloatingActionButton(
-                                      onPressed: () {
+                                      onPressed: () async{
                                         if (_messageController.text == "") {
                                           ScaffoldMessenger.of(
                                             context,
@@ -374,9 +382,21 @@ class _HomeScreenState extends State<HomeScreen>
                                               _messageController.text,
                                               File(selectedImage!.path),
                                             );
+                                            NotificationConfig.sendNotification(
+                                              token: (await FirebaseMessaging.instance.getToken())!, //fcm token for user
+                                              title: "Gemini Test",
+                                              body: _messageController.text,
+                                             data:{}
+                                            );
                                           } else {
                                             cubit.sendMessage(
                                               _messageController.text,
+                                            );
+                                            NotificationConfig.sendNotification(
+                                                token: (await FirebaseMessaging.instance.getToken())!,
+                                                title: "Gemini Test",
+                                                body: _messageController.text,
+                                                data:{}
                                             );
                                           }
                                           selectedImage = null;
