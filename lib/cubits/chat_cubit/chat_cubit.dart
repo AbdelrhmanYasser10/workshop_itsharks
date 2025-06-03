@@ -53,18 +53,18 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  void sendMessage(String content, [File? image]) async {
+  void sendMessage(String content, [File? file]) async {
     //store to firebase
     emit(SendMessageLoading());
     try {
       CloudinaryResponse? response;
-      if (image != null) {
+      if (file != null) {
         response = await cloudinary.upload(
-          file: image.path,
-          fileBytes: image.readAsBytesSync(),
+          file: file.path,
+          fileBytes: file.readAsBytesSync(),
           resourceType: CloudinaryResourceType.raw,
           folder: "Gemini - Images",
-          fileName: 'some-name',
+          fileName: 'some-name.${file.path.split("/").last.split(".").last}',
           progressCallback: (count, total) {
             print('Uploading file with progress: $count/$total');
           },
@@ -82,7 +82,7 @@ class ChatCubit extends Cubit<ChatState> {
             "content": content,
             "media": response?.url!,
           });
-      sendPromptToGemini(content,image);
+      sendPromptToGemini(content,file);
       emit(SendMessageSuccessfully());
     } catch (error) {
       print(error.toString());
