@@ -41,11 +41,13 @@ dependencies:
   firebase_ai: ^2.0.0
   firebase_auth: ^5.5.4
   google_fonts: ^6.2.1
-  chat_bubbles: ^1.7.0
+  chat_bubbles: any
   animated_text_kit: ^4.2.3
   formatted_text: ^4.0.1
   cloudinary: ^1.2.0
   image_picker: ^1.1.2
+  social_media_recorder: ^1.2.1
+  voice_message_player: ^1.1.2
 
 dev_dependencies:
   flutter_test:

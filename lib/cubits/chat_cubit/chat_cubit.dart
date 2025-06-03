@@ -62,11 +62,11 @@ class ChatCubit extends Cubit<ChatState> {
         response = await cloudinary.upload(
           file: image.path,
           fileBytes: image.readAsBytesSync(),
-          resourceType: CloudinaryResourceType.image,
+          resourceType: CloudinaryResourceType.raw,
           folder: "Gemini - Images",
           fileName: 'some-name',
           progressCallback: (count, total) {
-            print('Uploading image from file with progress: $count/$total');
+            print('Uploading file with progress: $count/$total');
           },
         );
       }
@@ -85,55 +85,128 @@ class ChatCubit extends Cubit<ChatState> {
       sendPromptToGemini(content,image);
       emit(SendMessageSuccessfully());
     } catch (error) {
+      print(error.toString());
       emit(SendMessageError());
     }
   }
 
   void sendPromptToGemini(String content, [File? file]) async {
     emit(SendPromptToGeminiLoading());
+    print("Gemini Responseeeee");
     try {
-      if(file == null) {
-        final response = await model.generateContent([Content.text(content)]);
-        await _database
-            .collection("users")
-            .doc(activeUser!.id)
-            .collection("chats")
-            .doc("0")
-            .collection("messages")
-            .add({
-          "isBotSender": true,
-          "time": Timestamp.now(),
-          "content": response.text,
-          "media": null,
-        });
+      /* Billing Account */
+      bool checkGenerateKeyWord = content.contains("generate") || content.contains("Generate");
+      if(checkGenerateKeyWord){
+        print("Gemini Responseeeee in generate");
+
+        final generateModel = FirebaseAI.googleAI().imagenModel(model: 'imagen-3.0-generate-002');
+        final response = await generateModel.generateImages(content);
+        print("Gemini Responseeeee after response");
+        print(response.filteredReason);
+        if (response.images.isNotEmpty) {
+          final image = response.images[0];
+          print(image);
+          // Process the image
+        } else {
+          // Handle the case where no images were generated
+          await _database
+              .collection("users")
+              .doc(activeUser!.id)
+              .collection("chats")
+              .doc("0")
+              .collection("messages")
+              .add({
+            "isBotSender": true,
+            "time": Timestamp.now(),
+            "content": "failed to imagine this prompt",
+            "media": null,
+          });
+        }
       }
-      else{
-        final prompt = TextPart(content);
+      else {
+        if (file == null) {
+          final response = await model.generateContent([Content.text(content)]);
+          await _database
+              .collection("users")
+              .doc(activeUser!.id)
+              .collection("chats")
+              .doc("0")
+              .collection("messages")
+              .add({
+            "isBotSender": true,
+            "time": Timestamp.now(),
+            "content": response.text,
+            "media": null,
+          });
+        }
+        else {
+          if(content.isEmpty){
+            final prompt = TextPart("answer the questions in the audio");
+
+// Prepare audio for input
+            final audio = await File(file.path).readAsBytes();
+            final audioType = file.path
+                .split("/")
+                .last
+                .split(".")
+                .last;
+// Provide the audio as `Data` with the appropriate audio MIME type
+            final audioPart = InlineDataPart('audio/$audioType', audio);
+
+// To generate text output, call `generateContent` with the text and audio
+            final response = await model.generateContent([
+              Content.multi([prompt,audioPart])
+            ]);
+
+// Print the generated text
+            await _database
+                .collection("users")
+                .doc(activeUser!.id)
+                .collection("chats")
+                .doc("0")
+                .collection("messages")
+                .add({
+              "isBotSender": true,
+              "time": Timestamp.now(),
+              "content": response.text,
+              "media": null,
+            });
+          }
+          else {
+            final prompt = TextPart(content);
 // Prepare images for input
-        final image = await file.readAsBytes();
-        final imageExtenstion = file.path.split("/").last.split(".").last;
-        final imagePart = InlineDataPart('image/$imageExtenstion', image);
+            final image = await file.readAsBytes();
+            final imageExtenstion = file.path
+                .split("/")
+                .last
+                .split(".")
+                .last;
+            final imagePart = InlineDataPart('image/$imageExtenstion', image);
 
 // To generate text output, call generateContent with the text and image
-        final response = await model.generateContent([
-          Content.multi([prompt,imagePart])
-        ]);
+            final response = await model.generateContent([
+              Content.multi([prompt, imagePart])
+            ]);
 
-        await _database
-            .collection("users")
-            .doc(activeUser!.id)
-            .collection("chats")
-            .doc("0")
-            .collection("messages")
-            .add({
-          "isBotSender": true,
-          "time": Timestamp.now(),
-          "content": response.text,
-          "media": null,
-        });
+
+            await _database
+                .collection("users")
+                .doc(activeUser!.id)
+                .collection("chats")
+                .doc("0")
+                .collection("messages")
+                .add({
+              "isBotSender": true,
+              "time": Timestamp.now(),
+              "content": response.text,
+              "media": null,
+            });
+          }
+        }
       }
       emit(SendPromptToGeminiSuccessfully());
     } catch (error) {
+      print(error.toString());
       emit(SendPromptToGeminiError());
     }
   }
